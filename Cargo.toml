@@ -1,0 +1,15 @@
+[package]
+name = "bitarray"
+version = "0.1.2"
+edition = "2018"
+authors = ["Geordon Worley <vadixidav@gmail.com>"]
+license = "MIT"
+description = "A compile time sized array of bits"
+repository = "https://github.com/vadixidav/bitarray"
+homepage = "https://github.com/vadixivav/bitarray"
+documentation = "https://docs.rs/bitarray/"
+keywords = ["data-structures", "bitarray", "bitmask", "bitmap", "bit"]
+readme = "README.md"
+
+[dependencies]
+bit-vec = "0.5.0"
