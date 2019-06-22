@@ -1,14 +1,16 @@
 #![feature(const_generics)]
 
+pub struct ConstBytes<const N: usize>([u8; N]);
+
 /// A constant sized array of bits. `N` defines the number of bits in the array.
 pub struct BitArray<const N: usize> {
-    storage: [u8; {(N + 7) / 8}],
+    bytes: ConstBytes<{(N + 7) / 8}>,
 }
 
 impl<const N: usize> BitArray<{N}> {
-    fn zeros() -> Self {
+    fn new(bytes: ConstBytes<{(N + 7) / 8}>) -> Self {
         Self {
-            storage: [0; {(N + 7) / 8}],
+            bytes,
         }
     }
 }
@@ -16,6 +18,6 @@ impl<const N: usize> BitArray<{N}> {
 #[cfg(test)]
 #[test]
 fn test_zeros() {
-    let array = BitArray::<5>::zeros();
-    assert!(&array.storage == &[0u8]);
+    let array = BitArray::<5>::new(ConstBytes([0]));
+    assert!(&array.storage.0 == &[0u8]);
 }
