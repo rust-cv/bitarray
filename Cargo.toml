@@ -11,4 +11,4 @@ keywords = ["data-structures", "bitarray", "bitmask", "bitmap", "bit"]
 readme = "README.md"
 
 [dependencies]
-bit-vec = "0.5.0"
+packed_simd = "0.3.3"
