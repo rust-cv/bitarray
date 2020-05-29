@@ -21,8 +21,37 @@ pub struct BitArray<const B: usize> {
 }
 
 impl<const B: usize> BitArray<B> {
+    /// Create a new `BitArray`.
+    ///
+    /// ```
+    /// use bitarray::BitArray;
+    /// let array = BitArray::new([0]);
+    /// assert_eq!(*array.bytes(), [0]);
+    /// ```
     pub fn new(bytes: [u8; B]) -> Self {
         Self { bytes }
+    }
+
+    /// Create a new `BitArray` with all zeros.
+    ///
+    /// ```
+    /// use bitarray::BitArray;
+    /// let array = BitArray::new([0]);
+    /// assert_eq!(array, BitArray::zeros());
+    /// ```
+    pub fn zeros() -> Self {
+        Self { bytes: [0; B] }
+    }
+
+    /// Retrieve the byte array of a `BitArray`.
+    ///
+    /// ```
+    /// use bitarray::BitArray;
+    /// let array = BitArray::new([1, 2]);
+    /// assert_eq!(*array.bytes(), [1, 2]);
+    /// ```
+    pub fn bytes(&self) -> &[u8; B] {
+        &self.bytes
     }
 }
 
@@ -47,11 +76,4 @@ impl<const B: usize> Hash for BitArray<B> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.bytes[..].hash(state)
     }
-}
-
-#[cfg(test)]
-#[test]
-fn test_zeros() {
-    let array = BitArray::<1>::new([0]);
-    assert_eq!(array.bytes, [0]);
 }
