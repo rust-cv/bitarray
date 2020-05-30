@@ -23,3 +23,5 @@ A compile time sized array of bits that uses const generics and intrinsics.
 
 This library was created to maximize the speed of hamming weight and hamming distance computation.
 It could be used for many other things. Contributions are welcome!
+
+Please visit [![Discord][dci]][dcl] if you have any questions.
