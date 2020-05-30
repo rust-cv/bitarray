@@ -5,16 +5,13 @@
 use core::{
     fmt,
     hash::{Hash, Hasher},
+    slice,
 };
-
-/// A byte array with an alignment of 64 to maximize the efficiency of SIMD operations.
-#[repr(align(64))]
-pub struct ConstBytes<const N: usize>([u8; N]);
 
 /// A constant sized array of bits. `B` defines the number of bytes.
 /// This has an alignment of 64 to maximize the efficiency of SIMD operations.
 /// It will automatically utilize SIMD at runtime where possible.
-#[repr(align(64))]
+#[repr(align(8))]
 #[derive(Clone)]
 pub struct BitArray<const B: usize> {
     bytes: [u8; B],
@@ -52,6 +49,32 @@ impl<const B: usize> BitArray<B> {
     /// ```
     pub fn bytes(&self) -> &[u8; B] {
         &self.bytes
+    }
+
+    /// Compute the hamming weight of the `BitArray`.
+    ///
+    /// ```
+    /// use bitarray::BitArray;
+    /// let array = BitArray::new([0xAA; 65]);
+    /// assert_eq!(array.weight(), 4 * 65);
+    /// ```
+    #[allow(clippy::cast_ptr_alignment)]
+    pub fn weight(&self) -> usize {
+        let simd_len = B >> 3;
+        let simd_bytes = simd_len << 3;
+        let simd_sum = unsafe {
+            slice::from_raw_parts(self.bytes.as_ptr() as *const u64, simd_len)
+                .iter()
+                .copied()
+                .map(|chunk| chunk.count_ones() as usize)
+                .sum::<usize>()
+        };
+        let remaining_sum = self.bytes[simd_bytes..]
+            .iter()
+            .copied()
+            .map(|b| b.count_ones() as usize)
+            .sum::<usize>();
+        simd_sum + remaining_sum
     }
 }
 
