@@ -36,7 +36,7 @@ extern "platform-intrinsic" {
 #[repr(align(64))]
 #[derive(Clone)]
 pub struct BitArray<const B: usize> {
-    bytes: [u8; B],
+    pub bytes: [u8; B],
 }
 
 impl<const B: usize> BitArray<B> {
