@@ -11,6 +11,7 @@
 use core::{
     fmt,
     hash::{Hash, Hasher},
+    ops::{Deref, DerefMut},
     slice,
 };
 
@@ -68,8 +69,9 @@ impl<const B: usize> BitArray<B> {
     ///
     /// ```
     /// use bitarray::BitArray;
-    /// let array = BitArray::new([0]);
-    /// assert_eq!(array, BitArray::zeros());
+    /// let array = BitArray::zeros();
+    /// assert_eq!(array, BitArray::new([0]));
+    /// assert_eq!(*array, [0]);
     /// ```
     pub fn zeros() -> Self {
         Self { bytes: [0; B] }
@@ -80,10 +82,22 @@ impl<const B: usize> BitArray<B> {
     /// ```
     /// use bitarray::BitArray;
     /// let array = BitArray::new([1, 2]);
-    /// assert_eq!(*array.bytes(), [1, 2]);
+    /// assert_eq!(*array, [1, 2]);
     /// ```
     pub fn bytes(&self) -> &[u8; B] {
         &self.bytes
+    }
+
+    /// Retrieve the mutable byte array of a `BitArray`.
+    ///
+    /// ```
+    /// use bitarray::BitArray;
+    /// let mut array = BitArray::new([1, 2]);
+    /// array.bytes_mut()[0] = 3;
+    /// assert_eq!(*array, [3, 2]);
+    /// ```
+    pub fn bytes_mut(&mut self) -> &mut [u8; B] {
+        &mut self.bytes
     }
 
     /// Compute the hamming weight of the `BitArray`.
@@ -181,6 +195,32 @@ impl<const B: usize> fmt::Debug for BitArray<B> {
 impl<const B: usize> Hash for BitArray<B> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.bytes[..].hash(state)
+    }
+}
+
+/// ```
+/// use bitarray::BitArray;
+/// let mut array = BitArray::new([1, 2]);
+/// assert_eq!(*array, [1, 2]);
+/// ```
+impl<const B: usize> Deref for BitArray<B> {
+    type Target = [u8; B];
+
+    fn deref(&self) -> &Self::Target {
+        &self.bytes
+    }
+}
+
+/// ```
+/// use bitarray::BitArray;
+/// let mut array = BitArray::zeros();
+/// array[0] = 1;
+/// array[1] = 2;
+/// assert_eq!(*array, [1, 2]);
+/// ```
+impl<const B: usize> DerefMut for BitArray<B> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.bytes
     }
 }
 
