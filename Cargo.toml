@@ -10,3 +10,6 @@ documentation = "https://docs.rs/bitarray/"
 keywords = ["const", "generics", "bit", "array", "hamming"]
 categories = ["no-std"]
 readme = "README.md"
+
+[dependencies]
+space = { version = "0.10.3", optional = true }

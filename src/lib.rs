@@ -14,6 +14,9 @@ use core::{
     slice,
 };
 
+#[cfg(feature = "space")]
+use space::MetricPoint;
+
 #[repr(simd)]
 #[derive(Copy, Clone)]
 struct Tup(u128, u128, u128, u128);
@@ -28,6 +31,16 @@ extern "C" {
 
 extern "platform-intrinsic" {
     fn simd_xor<T>(x: T, y: T) -> T;
+}
+
+/// Split the bytes up into number of operations of size (512, 64, 8)
+const fn split_up_simd(n: usize) -> (usize, usize, usize) {
+    let n_512 = n >> 6;
+    let bytes_512 = n_512 << 6;
+    let n_64 = (n - bytes_512) >> 3;
+    let bytes_64 = n_64 << 3;
+    let n_8 = n - bytes_512 - bytes_64;
+    (n_512, n_64, n_8)
 }
 
 /// A constant sized array of bits. `B` defines the number of bytes.
@@ -77,33 +90,34 @@ impl<const B: usize> BitArray<B> {
     ///
     /// ```
     /// use bitarray::BitArray;
-    /// let array = BitArray::new([0xAA; 65]);
-    /// assert_eq!(array.weight(), 4 * 65);
-    /// ```
-    /// Compute the hamming weight of the `BitArray`.
-    ///
-    /// ```
-    /// use bitarray::BitArray;
-    /// let array = BitArray::new([0xAA; 65]);
-    /// assert_eq!(array.weight(), 4 * 65);
+    /// let array = BitArray::new([0xAA; 83]);
+    /// assert_eq!(array.weight(), 4 * 83);
     /// ```
     #[allow(clippy::cast_ptr_alignment)]
     pub fn weight(&self) -> usize {
-        let simd_len = B >> 6;
-        let simd_bytes = simd_len << 6;
-        let simd_sum = unsafe {
-            slice::from_raw_parts(self.bytes.as_ptr() as *const Tup, simd_len)
+        let (n_512, n_64, n_8) = split_up_simd(self.bytes.len());
+        let sum_512 = unsafe {
+            slice::from_raw_parts(self.bytes.as_ptr() as *const Tup, n_512)
                 .iter()
                 .copied()
                 .map(|chunk| reduce_add_512(ctpop_512(chunk)) as usize)
                 .sum::<usize>()
         };
-        let remaining_sum = self.bytes[simd_bytes..]
+        let sum_64 = unsafe {
+            slice::from_raw_parts(self.bytes.as_ptr() as *const u64, n_64)
+                .iter()
+                .copied()
+                .map(|chunk| chunk.count_ones() as usize)
+                .sum::<usize>()
+        };
+
+        let sum_8 = self.bytes[self.bytes.len() - n_8..]
             .iter()
             .copied()
             .map(|b| b.count_ones() as usize)
             .sum::<usize>();
-        simd_sum + remaining_sum
+
+        sum_512 + sum_64 + sum_8
     }
 
     /// Compute the hamming distance to another `BitArray`.
@@ -167,5 +181,12 @@ impl<const B: usize> fmt::Debug for BitArray<B> {
 impl<const B: usize> Hash for BitArray<B> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.bytes[..].hash(state)
+    }
+}
+
+#[cfg(feature = "space")]
+impl<const B: usize> MetricPoint for BitArray<B> {
+    fn distance(&self, rhs: &Self) -> u32 {
+        self.distance(rhs) as u32
     }
 }
