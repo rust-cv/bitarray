@@ -48,7 +48,7 @@ const fn split_up_simd(n: usize) -> (usize, usize, usize) {
 /// This has an alignment of 64 to maximize the efficiency of SIMD operations.
 /// It will automatically utilize SIMD at runtime where possible.
 #[repr(align(64))]
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct BitArray<const B: usize> {
     pub bytes: [u8; B],
 }
