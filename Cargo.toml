@@ -13,3 +13,4 @@ readme = "README.md"
 
 [dependencies]
 space = { version = "0.10.3", optional = true }
+serde = { version = "1.0.114", default-features = false, features = ["derive"], optional = true }

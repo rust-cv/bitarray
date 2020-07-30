@@ -8,6 +8,9 @@
     platform_intrinsics
 )]
 
+#[cfg(feature = "serde")]
+mod serde_impl;
+
 use core::{
     fmt,
     hash::{Hash, Hasher},
