@@ -23,14 +23,14 @@ use space::MetricPoint;
 
 #[repr(simd)]
 #[derive(Copy, Clone)]
-struct Tup(u128, u128, u128, u128);
+struct Tup(i128, i128, i128, i128);
 
 #[allow(improper_ctypes, dead_code)]
 extern "C" {
     #[link_name = "llvm.ctpop.v4i128"]
     fn ctpop_512(x: Tup) -> Tup;
     #[link_name = "llvm.experimental.vector.reduce.add.v4i128"]
-    fn reduce_add_512(x: Tup) -> u128;
+    fn reduce_add_512(x: Tup) -> i128;
 }
 
 extern "platform-intrinsic" {
