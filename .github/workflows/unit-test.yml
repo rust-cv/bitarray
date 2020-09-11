@@ -5,6 +5,11 @@ on: [push, pull_request]
 name: unit tests
 
 jobs:
+  strategy:
+      matrix:
+        features:
+          - 
+          - unstable-512-bit-simd
   check:
     name: Check
     runs-on: ubuntu-latest
@@ -23,6 +28,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
+          args: --features ${{ matrix.features }}
 
   test:
     name: Test Suite
@@ -42,4 +48,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features
+          args: --features ${{ matrix.features }}

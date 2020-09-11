@@ -11,6 +11,10 @@ keywords = ["const", "generics", "bit", "array", "hamming"]
 categories = ["no-std"]
 readme = "README.md"
 
+[features]
+unstable-512-bit-simd = []
+
 [dependencies]
 space = { version = "0.10.3", optional = true }
 serde = { version = "1.0.114", default-features = false, features = ["derive"], optional = true }
+cfg-if = "0.1.10"
