@@ -12,6 +12,7 @@ jobs:
         features:
           - 
           - --features unstable-512-bit-simd
+          - --features serde
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -37,6 +38,7 @@ jobs:
         features:
           - 
           - --features unstable-512-bit-simd
+          - --features serde
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
