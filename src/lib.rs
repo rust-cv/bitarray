@@ -1,6 +1,5 @@
 #![no_std]
-#![allow(incomplete_features)]
-#![feature(const_generics)]
+#![feature(min_const_generics)]
 #![cfg_attr(
     feature = "unstable-512-bit-simd",
     feature(link_llvm_intrinsics, repr_simd, simd_ffi, platform_intrinsics)
