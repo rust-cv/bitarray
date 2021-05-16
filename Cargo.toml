@@ -15,6 +15,6 @@ readme = "README.md"
 unstable-512-bit-simd = []
 
 [dependencies]
-space = { version = "0.10.3", optional = true }
-serde = { version = "1.0.116", default-features = false, features = ["derive"], optional = true }
-cfg-if = "0.1.10"
+space = { version = "0.11.0", optional = true }
+serde = { version = "1.0.126", default-features = false, features = ["derive"], optional = true }
+cfg-if = "1.0.0"
