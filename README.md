@@ -24,6 +24,8 @@ A compile time sized array of bits that uses const generics and intrinsics.
 This library was created to maximize the speed of hamming weight and hamming distance computation.
 It could be used for many other things. Contributions are welcome!
 
+The minimum supported rustc version is 1.51
+
 ## Features
 
 Enable the `unstable-512-bit-simd` feature if you would like to use 512-bit SIMD instructions to speed up the library. This feature does not compile on all machines for some currently unknown reason, as an LLVM intrinsics error is reported, even with the same compiler version and host tripple.
