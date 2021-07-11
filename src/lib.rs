@@ -119,7 +119,7 @@ impl<const B: usize> BitArray<B> {
     /// assert_eq!(array.weight(), 4 * 83);
     /// ```
     #[allow(clippy::cast_ptr_alignment)]
-    pub fn weight(&self) -> usize {
+    pub fn weight(&self) -> u32 {
         cfg_if::cfg_if! {
             if #[cfg(feature = "unstable-512-bit-simd")] {
                 let (n_512, n_64, n_8) = split_up_simd(self.bytes.len());
@@ -127,22 +127,22 @@ impl<const B: usize> BitArray<B> {
                     slice::from_raw_parts(self.bytes.as_ptr() as *const Tup, n_512)
                         .iter()
                         .copied()
-                        .map(|chunk| reduce_add_512(ctpop_512(chunk)) as usize)
-                        .sum::<usize>()
+                        .map(|chunk| reduce_add_512(ctpop_512(chunk)) as u32)
+                        .sum::<u32>()
                 };
                 let sum_64 = unsafe {
                     slice::from_raw_parts(self.bytes.as_ptr() as *const u64, n_64)
                         .iter()
                         .copied()
-                        .map(|chunk| chunk.count_ones() as usize)
-                        .sum::<usize>()
+                        .map(|chunk| chunk.count_ones())
+                        .sum::<u32>()
                 };
 
                 let sum_8 = self.bytes[self.bytes.len() - n_8..]
                     .iter()
                     .copied()
-                    .map(|b| b.count_ones() as usize)
-                    .sum::<usize>();
+                    .map(|b| b.count_ones())
+                    .sum::<u32>();
 
                 sum_512 + sum_64 + sum_8
             } else {
@@ -151,15 +151,15 @@ impl<const B: usize> BitArray<B> {
                     slice::from_raw_parts(self.bytes.as_ptr() as *const u64, n_64)
                         .iter()
                         .copied()
-                        .map(|chunk| chunk.count_ones() as usize)
-                        .sum::<usize>()
+                        .map(|chunk| chunk.count_ones())
+                        .sum::<u32>()
                 };
 
                 let sum_8 = self.bytes[self.bytes.len() - n_8..]
                     .iter()
                     .copied()
-                    .map(|b| b.count_ones() as usize)
-                    .sum::<usize>();
+                    .map(|b| b.count_ones())
+                    .sum::<u32>();
 
                 sum_64 + sum_8
             }
@@ -182,7 +182,7 @@ impl<const B: usize> BitArray<B> {
     /// assert_eq!(a.distance(&b), 0);
     /// ```
     #[allow(clippy::cast_ptr_alignment)]
-    pub fn distance(&self, other: &Self) -> usize {
+    pub fn distance(&self, other: &Self) -> u32 {
         cfg_if::cfg_if! {
             if #[cfg(feature = "unstable-512-bit-simd")] {
                 let simd_len = B >> 6;
@@ -196,23 +196,23 @@ impl<const B: usize> BitArray<B> {
                                 .iter()
                                 .copied(),
                         )
-                        .map(|(a, b)| reduce_add_512(ctpop_512(simd_xor(a, b))) as usize)
-                        .sum::<usize>()
+                        .map(|(a, b)| reduce_add_512(ctpop_512(simd_xor(a, b))) as u32)
+                        .sum::<u32>()
                 };
                 let remaining_sum = self.bytes[simd_bytes..]
                     .iter()
                     .copied()
                     .zip(other.bytes[simd_bytes..].iter().copied())
-                    .map(|(a, b)| (a ^ b).count_ones() as usize)
-                    .sum::<usize>();
+                    .map(|(a, b)| (a ^ b).count_ones())
+                    .sum::<u32>();
                 simd_sum + remaining_sum
             } else {
                 self.bytes
                     .iter()
                     .copied()
                     .zip(other.bytes.iter().copied())
-                    .map(|(a, b)| (a ^ b).count_ones() as usize)
-                    .sum::<usize>()
+                    .map(|(a, b)| (a ^ b).count_ones())
+                    .sum::<u32>()
             }
         }
     }
@@ -269,6 +269,8 @@ impl<const B: usize> DerefMut for BitArray<B> {
 
 #[cfg(feature = "space")]
 impl<const B: usize> MetricPoint for BitArray<B> {
+    type Metric = u32;
+
     fn distance(&self, rhs: &Self) -> u32 {
         self.distance(rhs) as u32
     }

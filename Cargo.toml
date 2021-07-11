@@ -12,9 +12,10 @@ categories = ["no-std"]
 readme = "README.md"
 
 [features]
+# This does not seem to build on all Windows machines (compiler has an access violation), and only works on Nightly.
 unstable-512-bit-simd = []
 
 [dependencies]
-space = { version = "0.11.0", optional = true }
+space = { version = "0.13.1", optional = true }
 serde = { version = "1.0.126", default-features = false, features = ["derive"], optional = true }
 cfg-if = "1.0.0"
