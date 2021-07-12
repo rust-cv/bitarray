@@ -3,7 +3,7 @@
 use bitarray::BitArray;
 
 #[test]
-fn bincode_cycle() {
+fn bincode_serde_json_cycle() {
     let old_bits = vec![BitArray::new([0, 1, 2, 3, 255])];
     let mut bdata = vec![];
     bincode::serialize_into(&mut bdata, &old_bits).expect("failed to serialize with bincode");
