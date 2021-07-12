@@ -41,9 +41,7 @@ impl<'de, const B: usize> Visitor<'de> for BitArrayVisitor<B> {
         // Continuously fill the array with more values.
         while let Some(value) = seq.next_element()? {
             if ix == B {
-                return Err(Error::custom(concat!(
-                    "bitarray: too many bytes in sequence"
-                )));
+                return Err(Error::custom("bitarray: too many bytes in sequence"));
             }
             arr[ix] = value;
             ix += 1;
