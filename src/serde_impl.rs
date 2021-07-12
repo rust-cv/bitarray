@@ -50,10 +50,7 @@ impl<'de, const B: usize> Visitor<'de> for BitArrayVisitor<B> {
         }
 
         if ix != B {
-            Err(Error::invalid_length(
-                ix,
-                &"bitarray: too few bytes in sequence",
-            ))
+            Err(Error::invalid_length(ix, &BitArrayExpectedBytes::<B>))
         } else {
             Ok(BitArray::new(arr))
         }
@@ -80,6 +77,6 @@ struct BitArrayExpectedBytes<const B: usize>;
 
 impl<const B: usize> Expected for BitArrayExpectedBytes<B> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{} bytes was expected", B)
+        write!(formatter, "{} bytes", B)
     }
 }
