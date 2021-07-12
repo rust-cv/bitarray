@@ -1,6 +1,9 @@
 use crate::BitArray;
 use core::fmt;
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::{Error, Expected, SeqAccess, Visitor}};
+use serde::{
+    de::{Error, Expected, SeqAccess, Visitor},
+    Deserialize, Deserializer, Serialize, Serializer,
+};
 
 impl<const B: usize> Serialize for BitArray<B> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -31,22 +34,24 @@ impl<'de, const B: usize> Visitor<'de> for BitArrayVisitor<B> {
 
     fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
     where
-            A: SeqAccess<'de>, {
+        A: SeqAccess<'de>,
+    {
         let mut arr = [0u8; B];
         let mut ix = 0;
         // Continuously fill the array with more values.
         while let Some(value) = seq.next_element()? {
             if ix == B {
-                return Err(Error::custom(
-                    concat!("bitarray: too many bytes in sequence"),
-                ));
+                return Err(Error::custom(concat!(
+                    "bitarray: too many bytes in sequence"
+                )));
             }
             arr[ix] = value;
             ix += 1;
         }
 
         if ix != B {
-            Err(Error::invalid_length(ix,
+            Err(Error::invalid_length(
+                ix,
                 &"bitarray: too few bytes in sequence",
             ))
         } else {
@@ -70,7 +75,6 @@ impl<'de, const B: usize> Visitor<'de> for BitArrayVisitor<B> {
         }
     }
 }
-
 
 struct BitArrayExpectedBytes<const B: usize>;
 
