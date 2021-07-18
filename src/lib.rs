@@ -15,7 +15,7 @@ use core::{
 };
 
 #[cfg(feature = "space")]
-use space::MetricPoint;
+use space::Metric;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "unstable-512-bit-simd")] {
@@ -268,10 +268,13 @@ impl<const B: usize> DerefMut for BitArray<B> {
 }
 
 #[cfg(feature = "space")]
-impl<const B: usize> MetricPoint for BitArray<B> {
-    type Metric = u32;
+struct Hamming;
 
-    fn distance(&self, rhs: &Self) -> u32 {
-        self.distance(rhs) as u32
+#[cfg(feature = "space")]
+impl<const B: usize> Metric<BitArray<B>> for Hamming {
+    type Unit = u32;
+
+    fn distance(&self, a: &BitArray<B>, b: &BitArray<B>) -> u32 {
+        a.distance(b) as u32
     }
 }
