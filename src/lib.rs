@@ -268,7 +268,8 @@ impl<const B: usize> DerefMut for BitArray<B> {
 }
 
 #[cfg(feature = "space")]
-struct Hamming;
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Hamming;
 
 #[cfg(feature = "space")]
 impl<const B: usize> Metric<BitArray<B>> for Hamming {
