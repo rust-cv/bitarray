@@ -10,7 +10,6 @@ mod serde_impl;
 use core::{
     fmt,
     hash::{Hash, Hasher},
-    num::dec2flt::rawfp::RawFloat,
     ops::{BitAnd, BitOr, BitXor, Deref, DerefMut},
     slice,
 };
