@@ -223,36 +223,33 @@ impl<const B: usize> BitArray<B> {
 impl<const B: usize> BitAnd for BitArray<B> {
     type Output = Self;
 
-    fn bitand(self, rhs: Self) -> Self::Output {
-        let mut out = self.clone();
-        for (d, s) in out.iter_mut().zip(rhs.iter().copied()) {
+    fn bitand(mut self, rhs: Self) -> Self::Output {
+        for (d, s) in self.iter_mut().zip(rhs.iter().copied()) {
             *d &= s;
         }
-        out
+        self
     }
 }
 
 impl<const B: usize> BitOr for BitArray<B> {
     type Output = Self;
 
-    fn bitor(self, rhs: Self) -> Self::Output {
-        let mut out = self.clone();
-        for (d, s) in out.iter_mut().zip(rhs.iter().copied()) {
+    fn bitor(mut self, rhs: Self) -> Self::Output {
+        for (d, s) in self.iter_mut().zip(rhs.iter().copied()) {
             *d |= s;
         }
-        out
+        self
     }
 }
 
 impl<const B: usize> BitXor for BitArray<B> {
     type Output = Self;
 
-    fn bitxor(self, rhs: Self) -> Self::Output {
-        let mut out = self.clone();
-        for (d, s) in out.iter_mut().zip(rhs.iter().copied()) {
+    fn bitxor(mut self, rhs: Self) -> Self::Output {
+        for (d, s) in self.iter_mut().zip(rhs.iter().copied()) {
             *d ^= s;
         }
-        out
+        self
     }
 }
 
