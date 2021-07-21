@@ -10,7 +10,8 @@ mod serde_impl;
 use core::{
     fmt,
     hash::{Hash, Hasher},
-    ops::{Deref, DerefMut},
+    num::dec2flt::rawfp::RawFloat,
+    ops::{BitAnd, BitOr, BitXor, Deref, DerefMut},
     slice,
 };
 
@@ -111,7 +112,9 @@ impl<const B: usize> BitArray<B> {
         &mut self.bytes
     }
 
-    /// Compute the hamming weight of the `BitArray`.
+    /// Compute the hamming weight (number of ones) of the `BitArray`.
+    ///
+    /// This is also called `count_ones` in the standard library.
     ///
     /// ```
     /// use bitarray::BitArray;
@@ -218,6 +221,42 @@ impl<const B: usize> BitArray<B> {
     }
 }
 
+impl<const B: usize> BitAnd for BitArray<B> {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        let mut out = self.clone();
+        for (d, s) in out.iter_mut().zip(rhs.iter().copied()) {
+            *d &= s;
+        }
+        out
+    }
+}
+
+impl<const B: usize> BitOr for BitArray<B> {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        let mut out = self.clone();
+        for (d, s) in out.iter_mut().zip(rhs.iter().copied()) {
+            *d |= s;
+        }
+        out
+    }
+}
+
+impl<const B: usize> BitXor for BitArray<B> {
+    type Output = Self;
+
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        let mut out = self.clone();
+        for (d, s) in out.iter_mut().zip(rhs.iter().copied()) {
+            *d ^= s;
+        }
+        out
+    }
+}
+
 impl<const B: usize> PartialEq for BitArray<B> {
     fn eq(&self, other: &Self) -> bool {
         self.bytes
@@ -267,6 +306,7 @@ impl<const B: usize> DerefMut for BitArray<B> {
     }
 }
 
+/// Provides [hamming distance](https://en.wikipedia.org/wiki/Hamming_distance) as a metric.
 #[cfg(feature = "space")]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -278,5 +318,29 @@ impl<const B: usize> Metric<BitArray<B>> for Hamming {
 
     fn distance(&self, a: &BitArray<B>, b: &BitArray<B>) -> u32 {
         a.distance(b) as u32
+    }
+}
+
+/// Provides [Jaccard distance](https://en.wikipedia.org/wiki/Jaccard_index) as a metric.
+///
+/// The Jaccard similarity is computed and then all of the bits are flipped in the resulting `u32`
+/// so that items are ordered by Jaccard distance/dissimilarity.
+#[cfg(feature = "space")]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Jaccard;
+
+#[cfg(feature = "space")]
+impl<const B: usize> Metric<BitArray<B>> for Jaccard {
+    type Unit = u32;
+
+    fn distance(&self, &a: &BitArray<B>, &b: &BitArray<B>) -> u32 {
+        let intersection = (a & b).weight();
+        let union = (a | b).weight();
+        if union == 0 {
+            0
+        } else {
+            !(intersection as f32 / union as f32).to_bits()
+        }
     }
 }
