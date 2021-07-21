@@ -1,6 +1,6 @@
 [package]
 name = "bitarray"
-version = "0.9.2-alpha.0"
+version = "0.9.2"
 edition = "2018"
 authors = ["Geordon Worley <vadixidav@gmail.com>"]
 license = "MIT"
