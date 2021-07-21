@@ -319,7 +319,7 @@ impl<const B: usize> Metric<BitArray<B>> for Hamming {
 
 /// Provides [Jaccard distance](https://en.wikipedia.org/wiki/Jaccard_index) as a metric.
 ///
-/// The Jaccard similarity is computed and then all of the bits are flipped in the resulting `u32`
+/// The Jaccard similarity is computed and then subtracted from `1.0`
 /// so that items are ordered by Jaccard distance/dissimilarity.
 #[cfg(feature = "space")]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -336,7 +336,7 @@ impl<const B: usize> Metric<BitArray<B>> for Jaccard {
         if union == 0 {
             0
         } else {
-            !(intersection as f32 / union as f32).to_bits()
+            (1.0 - intersection as f32 / union as f32).to_bits()
         }
     }
 }
